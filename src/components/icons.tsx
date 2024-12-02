@@ -5,7 +5,7 @@ export const Icons = {
   moon: Moon,
   logOut: LogOut,
   loader: Loader2,
-  github: (props: LucideProps) => (
+  google: (props: LucideProps) => (
     <svg
       viewBox="0 0 438.549 438.549"
       {...props}

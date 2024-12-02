@@ -32,7 +32,7 @@ const Home = () => {
             href="https://github.com/Skolaczk/next-starter"
             target="_blank"
           >
-            <Icons.github className="mr-2 size-4" /> {m.github()}
+            <Icons.google className="mr-2 size-4" /> {m.github()}
           </a>
         </Button>
       </div>

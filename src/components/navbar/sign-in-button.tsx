@@ -12,7 +12,7 @@ export const SignInButton = () => {
 
   const handleSignIn = () => {
     startTransition(async () => {
-      await signIn('github')
+      await signIn('google')
     })
   }
 
