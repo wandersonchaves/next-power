@@ -1,4 +1,4 @@
-const { paraglide } = require('@inlang/paraglide-next/plugin');
+const {paraglide} = require('@inlang/paraglide-next/plugin')
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -9,7 +9,7 @@ const nextConfig = {
       },
     ],
   },
-};
+}
 
 module.exports = paraglide({
   paraglide: {
@@ -17,4 +17,4 @@ module.exports = paraglide({
     outdir: './src/paraglide',
   },
   ...nextConfig,
-});
+})
