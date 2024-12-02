@@ -1,11 +1,11 @@
 import {Loader2, LogOut, LucideProps, Moon, Sun} from 'lucide-react'
 
 export const Icons = {
-  sun: Sun,
-  moon: Moon,
-  logOut: LogOut,
-  loader: Loader2,
-  google: (props: LucideProps) => (
+  Sun: Sun,
+  Moon: Moon,
+  LogOut: LogOut,
+  Loader: Loader2,
+  Google: (props: LucideProps) => (
     <svg
       viewBox="0 0 438.549 438.549"
       {...props}

@@ -21,7 +21,7 @@ export const SignInButton = () => {
       onClick={handleSignIn}
       disabled={isPending}
     >
-      {isPending && <Icons.loader className="mr-2 size-4 animate-spin" />}
+      {isPending && <Icons.Loader className="mr-2 size-4 animate-spin" />}
       {m.sign_in()}
     </Button>
   )

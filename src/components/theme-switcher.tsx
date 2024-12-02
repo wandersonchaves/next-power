@@ -22,8 +22,8 @@ export const ThemeSwitcher = ({className}: ThemeSwitcherProps) => {
       aria-label={m.theme_toggle_label()}
       onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
     >
-      <Icons.sun className="dark:hidden" />
-      <Icons.moon className="hidden dark:block" />
+      <Icons.Sun className="dark:hidden" />
+      <Icons.Moon className="hidden dark:block" />
     </Button>
   )
 }

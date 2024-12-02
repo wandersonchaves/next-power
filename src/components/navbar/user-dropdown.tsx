@@ -57,7 +57,7 @@ export const UserDropdown = ({session: {user}}: {session: Session}) => {
             ) : (
               <>
                 {isPending && (
-                  <Icons.loader className="mr-2 size-4 animate-spin" />
+                  <Icons.Loader className="mr-2 size-4 animate-spin" />
                 )}
                 {m.upgrade_to_pro_cta()}
               </>
@@ -66,7 +66,7 @@ export const UserDropdown = ({session: {user}}: {session: Session}) => {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut()}>
-          <Icons.logOut className="mr-2 size-4" /> <span>{m.log_out()}</span>
+          <Icons.LogOut className="mr-2 size-4" /> <span>{m.log_out()}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
