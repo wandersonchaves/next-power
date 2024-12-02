@@ -1,59 +1,182 @@
 import {NextResponse} from 'next/server'
+import {getServerSession} from 'next-auth/next'
 import * as XLSX from 'xlsx'
 
+import {authOptions} from '@/app/api/auth/[...nextauth]/auth-options'
 import {prisma} from '@/lib/prisma'
 
-type ExcelRow = {
-  'Carimbo de data/hora': string
-  Pontuação: string
+interface CustomerRow {
   'NOME COMPLETO': string
-  CPF: string
-  'DATA DE NASCIMENTO': string
-  'TELEFONE/WHATS': string
-  'EMAIL DE CONTATO': string
-  CEP: string
-  ENDEREÇO: string
-  'NOME COMPLETO DO CÔNJUGE': string
+  'CPF ': string
+  'DATA DE NASCIMENTO'?: string
+  'TELEFONE/WHATS'?: string | number
+  'EMAIL DE CONTATO'?: string
+  ENDEREÇO?: string
+  CEP?: string | number
+  'NOME COMPLETO DO CÔNJUGE'?: string
+  Pontuação?: number | string
+  'Carimbo de data/hora'?: string
+}
+
+function sanitizeCpf(cpf: unknown): string {
+  if (typeof cpf === 'number') {
+    cpf = cpf.toString()
+  }
+
+  if (typeof cpf !== 'string' || !cpf) {
+    return ''
+  }
+
+  return cpf.replace(/\D/g, '')
 }
 
 export async function POST(req: Request) {
   try {
+    const session = await getServerSession(authOptions)
+
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json(
+        {message: 'Usuário não autenticado ou sessão inválida.'},
+        {status: 401},
+      )
+    }
+
+    const userId = session.user.id
+
     const formData = await req.formData()
     const file = formData.get('file') as File
 
     if (!file) {
-      return NextResponse.json({message: 'File is required'}, {status: 400})
+      return NextResponse.json(
+        {message: 'Nenhum arquivo foi enviado.'},
+        {status: 400},
+      )
     }
 
     const buffer = await file.arrayBuffer()
     const workbook = XLSX.read(buffer, {type: 'array'})
     const sheet = workbook.Sheets[workbook.SheetNames[0]]
-    const data = XLSX.utils.sheet_to_json(sheet)
+    const data = XLSX.utils.sheet_to_json(sheet) as CustomerRow[]
 
-    const customers = (data as ExcelRow[]).map((row) => ({
-      name: row['NOME COMPLETO'],
-      cpf: row['CPF'],
-      birthDate: new Date(row['DATA DE NASCIMENTO']),
-      phone: row['TELEFONE/WHATS'],
-      email: row['EMAIL DE CONTATO'],
-      address: row['ENDEREÇO'],
-      postalCode: row['CEP'],
-      spouseName: row['NOME COMPLETO DO CÔNJUGE'],
-      points: parseInt(row['Pontuação'], 10) || 0,
-      timestamp: new Date(row['Carimbo de data/hora']),
-      userId: 'user-id-placeholder',
-    }))
+    if (!Array.isArray(data) || data.length === 0) {
+      return NextResponse.json(
+        {message: 'O arquivo está vazio ou possui um formato inválido.'},
+        {status: 400},
+      )
+    }
 
-    const result = await prisma.customer.createMany({
-      data: customers,
-      skipDuplicates: true,
+    const validCustomers = data.map((row: CustomerRow) => {
+      const rawCpf = row['CPF '] || null
+      const cpf = sanitizeCpf(rawCpf)
+
+      const isCpfValid = cpf && /^[0-9]{11}$/.test(cpf)
+
+      return {
+        name: row['NOME COMPLETO'] || 'Nome não informado',
+        cpf: isCpfValid ? cpf : null,
+        birthDate: row['DATA DE NASCIMENTO']
+          ? new Date(row['DATA DE NASCIMENTO'])
+          : null,
+        phone: row['TELEFONE/WHATS'] ? String(row['TELEFONE/WHATS']) : null,
+        email: row['EMAIL DE CONTATO'] || null,
+        address: row['ENDEREÇO'] ? String(row['ENDEREÇO']) : null,
+        postalCode: row['CEP'] ? String(row['CEP']) : null,
+        spouseName: row['NOME COMPLETO DO CÔNJUGE'] || null,
+        points: parseInt(row['Pontuação'] as string, 10) || 0,
+        timestamp: row['Carimbo de data/hora']
+          ? new Date(row['Carimbo de data/hora'])
+          : null,
+        userId,
+      }
     })
 
-    return NextResponse.json({message: 'Data uploaded successfully', result})
+    const filteredCustomers = validCustomers.filter((customer) => {
+      if (!customer.cpf) {
+        console.warn(`Registro ignorado: CPF inválido para ${customer.name}`)
+        return false
+      }
+      return true
+    })
+
+    const results = []
+    const errors = []
+
+    for (const customer of filteredCustomers) {
+      if (!customer.cpf || customer.cpf.trim() === '') {
+        console.warn(`CPF inválido para o cliente: ${customer.name}`)
+        continue
+      }
+
+      if (typeof customer.address !== 'string' && customer.address !== null) {
+        console.warn(`Endereço inválido para ${customer.name}`)
+        customer.address = null
+      }
+
+      try {
+        const result = await prisma.customer.upsert({
+          where: {cpf: customer.cpf},
+          update: {
+            name: {set: customer.name},
+            birthDate: customer.birthDate
+              ? {set: customer.birthDate}
+              : undefined,
+            phone: customer.phone ? {set: customer.phone} : undefined,
+            email: customer.email ? {set: customer.email} : undefined,
+            address: customer.address ? {set: customer.address} : undefined,
+            postalCode: customer.postalCode
+              ? {set: customer.postalCode}
+              : undefined,
+            spouseName: customer.spouseName
+              ? {set: customer.spouseName}
+              : undefined,
+            points: customer.points,
+            timestamp: customer.timestamp
+              ? {set: customer.timestamp}
+              : undefined,
+            userId: {set: customer.userId},
+            updatedAt: {set: new Date()},
+          },
+          create: {
+            name: customer.name,
+            cpf: customer.cpf,
+            birthDate: customer.birthDate,
+            phone: customer.phone,
+            email: customer.email,
+            address: customer.address,
+            postalCode: customer.postalCode,
+            spouseName: customer.spouseName,
+            points: customer.points,
+            timestamp: customer.timestamp,
+            userId: customer.userId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        })
+
+        results.push(result)
+      } catch (error) {
+        console.error('Erro ao salvar registro:', customer, error)
+
+        errors.push({
+          customer,
+          error: error instanceof Error ? error.message : 'Erro desconhecido',
+        })
+      }
+    }
+
+    return NextResponse.json({
+      message: 'Processamento concluído',
+      successCount: results.length,
+      errorCount: errors.length,
+      errors,
+    })
   } catch (error) {
-    console.error('Error uploading data:', error)
+    const errorMessage =
+      error instanceof Error ? error.message : 'Erro desconhecido'
+    console.error('Erro detalhado no upload:', errorMessage)
+
     return NextResponse.json(
-      {message: 'Error uploading data', error},
+      {message: 'Erro ao processar a solicitação.', error: errorMessage},
       {status: 500},
     )
   }
