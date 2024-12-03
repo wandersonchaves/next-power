@@ -23,6 +23,12 @@ const FileUpload: React.FC<FileUploadProps> = ({onFileUpload, loading}) => {
         className="mb-4"
       />
       <button
+        onClick={() => {
+          const input = document.querySelector(
+            'input[type="file"]',
+          ) as HTMLInputElement
+          input?.click()
+        }}
         className={`rounded bg-blue-600 px-4 py-2 text-white ${
           loading ? 'cursor-not-allowed opacity-50' : ''
         }`}

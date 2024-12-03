@@ -9,7 +9,7 @@ export const Footer = () => {
         className="p-0"
         asChild
       >
-        <a href="https://michalskolak.vercel.app/">Michał Skolak</a>
+        <a href="https://wandersonchaves.vercel.app/">Wanderson Chaves</a>
       </Button>
     </footer>
   )

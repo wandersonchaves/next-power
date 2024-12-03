@@ -4,6 +4,7 @@ import * as XLSX from 'xlsx'
 
 import {authOptions} from '@/app/api/auth/[...nextauth]/auth-options'
 import {prisma} from '@/lib/prisma'
+import {logError} from '@/utils/logger'
 
 interface CustomerRow {
   'NOME COMPLETO': string
@@ -173,7 +174,7 @@ export async function POST(req: Request) {
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Erro desconhecido'
-    console.error('Erro detalhado no upload:', errorMessage)
+    logError('Erro detalhado no upload:', errorMessage)
 
     return NextResponse.json(
       {message: 'Erro ao processar a solicitação.', error: errorMessage},

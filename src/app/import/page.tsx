@@ -4,6 +4,7 @@ import React, {useState} from 'react'
 import {toast} from 'react-hot-toast'
 
 import FileUpload from '@/components/FileUpload'
+import {logError} from '@/utils/logger'
 
 const ImportPage: React.FC = () => {
   const [loading, setLoading] = useState(false)
@@ -22,10 +23,10 @@ const ImportPage: React.FC = () => {
       if (response.ok) {
         console.log('Upload realizado com sucesso!')
       } else {
-        console.error('Erro no upload:', await response.json())
+        logError('Erro no upload:', await response.json())
       }
     } catch (error) {
-      console.error('Erro ao importar:', error)
+      logError('Erro ao importar:', error)
       toast.error('Erro ao processar o arquivo.')
     } finally {
       setLoading(false)
