@@ -34,7 +34,7 @@ const ImportPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mt-10 flex flex-col items-center gap-3 text-center md:absolute md:left-1/2 md:top-1/2 md:mt-0 md:-translate-x-1/2 md:-translate-y-1/2">
       <h1 className="mb-4 text-2xl font-bold">Importar Arquivo Excel</h1>
       <FileUpload
         onFileUpload={handleFileUpload}

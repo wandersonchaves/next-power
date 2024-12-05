@@ -6,19 +6,25 @@ declare module 'sdk-typescript-apis-efi' {
     certificate: string
   }
 
-  interface EfiPayData {
+  export interface EfiPayData {
     carnet_id: number
     status: string
-    cover: string
+    repeats: number
+    value: number
     link: string
-    carnet_link: string
+    carnetLink?: string
     pdf: {
       carnet: string
       cover: string
     }
-    charges: {
+    created_at: string
+    history: Array<{
+      message: string
+      created_at: string
+    }>
+    charges: Array<{
       charge_id: number
-      parcel: string
+      parcel: number
       status: string
       value: number
       expire_at: string
@@ -32,7 +38,11 @@ declare module 'sdk-typescript-apis-efi' {
         qrcode: string
         qrcode_image: string
       }
-    }[]
+      configurations: {
+        interest: number
+        fine: number
+      }
+    }>
   }
 
   interface EfiPayResponse {

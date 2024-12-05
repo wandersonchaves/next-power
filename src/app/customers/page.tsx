@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useState} from 'react'
+import {useState} from 'react'
 
 import CustomerTable from '@/components/CustomerTable'
 import Pagination from '@/components/Pagination'

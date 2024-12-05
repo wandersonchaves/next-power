@@ -64,20 +64,64 @@ model VerificationToken {
 }
 
 model Customer {
-  id           String    @id @default(cuid())
-  name         String
-  cpf          String    @unique
-  birthDate    DateTime?
-  phone        String?
-  email        String?
-  address      String?
-  postalCode   String?
-  isCarnetPaid Boolean   @default(false)
-  spouseName   String?
-  points       Int       @default(0)
-  timestamp    DateTime?
-  userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id              String    @id @default(cuid())
+  name            String
+  cpf             String    @unique
+  birthDate       DateTime?
+  phone           String?
+  email           String?
+  address         String?
+  postalCode      String?
+  spouseName      String?
+  carnetGenerated Boolean   @default(false)
+
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  carnets Carnet[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Carnet {
+  id String @id @default(cuid())
+
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+
+  carnetId   String  @unique
+  status     String
+  repeats    Int
+  value      Int
+  cover      String
+  link       String
+  carnetLink String?
+  pdf        String
+
+  createdAt DateTime @default(now())
+  charges   Charge[]
+
+  history Json
+}
+
+model Charge {
+  id String @id @default(cuid())
+
+  carnet   Carnet @relation(fields: [carnetId], references: [id])
+  carnetId String
+
+  chargeId   String @unique
+  status     String
+  url        String
+  barcode    String
+  pdf        String
+  pixQrCode  String
+  pixQrImage String
+  parcel     Int
+  value      Int
+
+  expireAt  DateTime
+  createdAt DateTime @default(now())
+
+  configurations Json
 }

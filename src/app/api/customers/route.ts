@@ -6,8 +6,8 @@ import {logError} from '@/utils/logger'
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url)
-    const page = parseInt(url.searchParams.get('page') || '1', 10)
-    const limit = parseInt(url.searchParams.get('limit') || '10', 10)
+    const page = parseInt(url.searchParams.get('page') ?? '1', 10)
+    const limit = parseInt(url.searchParams.get('limit') ?? '10', 10)
 
     const customersData = await getCustomers({page, limit})
 

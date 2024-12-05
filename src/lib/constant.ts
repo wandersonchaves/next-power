@@ -17,5 +17,5 @@ export const siteConfig = {
     m.meta_keyword_prisma(),
   ],
   url: () => env.APP_URL,
-  googleSiteVerificationId: () => env.GOOGLE_SITE_VERIFICATION_ID || '',
+  googleSiteVerificationId: () => env.GOOGLE_SITE_VERIFICATION_ID ?? '',
 }

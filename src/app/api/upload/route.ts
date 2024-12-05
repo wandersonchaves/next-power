@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     const buffer = await file.arrayBuffer()
     const workbook = XLSX.read(buffer, {type: 'array'})
     const sheet = workbook.Sheets[workbook.SheetNames[0]]
-    const data = XLSX.utils.sheet_to_json(sheet) as CustomerRow[]
+    const data = XLSX.utils.sheet_to_json<CustomerRow>(sheet)
 
     if (!Array.isArray(data) || data.length === 0) {
       return NextResponse.json(
@@ -66,11 +66,11 @@ export async function POST(req: Request) {
       )
     }
 
-    const validCustomers = data.map((row: CustomerRow) => {
+    const validCustomers = data.map((row) => {
       const rawCpf = row['CPF '] || null
       const cpf = sanitizeCpf(rawCpf)
 
-      const isCpfValid = cpf && /^[0-9]{11}$/.test(cpf)
+      const isCpfValid = cpf && /^\d{11}$/.test(cpf)
 
       return {
         name: row['NOME COMPLETO'] || 'Nome não informado',
@@ -79,14 +79,10 @@ export async function POST(req: Request) {
           ? new Date(row['DATA DE NASCIMENTO'])
           : null,
         phone: row['TELEFONE/WHATS'] ? String(row['TELEFONE/WHATS']) : null,
-        email: row['EMAIL DE CONTATO'] || null,
+        email: row['EMAIL DE CONTATO'] ?? null,
         address: row['ENDEREÇO'] ? String(row['ENDEREÇO']) : null,
         postalCode: row['CEP'] ? String(row['CEP']) : null,
-        spouseName: row['NOME COMPLETO DO CÔNJUGE'] || null,
-        points: parseInt(row['Pontuação'] as string, 10) || 0,
-        timestamp: row['Carimbo de data/hora']
-          ? new Date(row['Carimbo de data/hora'])
-          : null,
+        spouseName: row['NOME COMPLETO DO CÔNJUGE'] ?? null,
         userId,
       }
     })
@@ -130,10 +126,6 @@ export async function POST(req: Request) {
             spouseName: customer.spouseName
               ? {set: customer.spouseName}
               : undefined,
-            points: customer.points,
-            timestamp: customer.timestamp
-              ? {set: customer.timestamp}
-              : undefined,
             userId: {set: customer.userId},
             updatedAt: {set: new Date()},
           },
@@ -146,8 +138,6 @@ export async function POST(req: Request) {
             address: customer.address,
             postalCode: customer.postalCode,
             spouseName: customer.spouseName,
-            points: customer.points,
-            timestamp: customer.timestamp,
             userId: customer.userId,
             createdAt: new Date(),
             updatedAt: new Date(),

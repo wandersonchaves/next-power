@@ -25,6 +25,8 @@ export const getCustomers = async ({
           email: true,
           phone: true,
           createdAt: true,
+          carnetGenerated: true,
+          carnets: true,
         },
       }),
       prisma.customer.count(),

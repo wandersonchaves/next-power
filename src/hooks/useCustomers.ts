@@ -1,14 +1,9 @@
+'use client'
+
 import {useEffect, useState} from 'react'
 
+import type {Customer} from '@/types/Customer'
 import {logError} from '@/utils/logger'
-
-interface Customer {
-  id: string
-  name: string
-  cpf: string
-  email: string
-  phone: string
-}
 
 interface UseCustomersResult {
   customers: Customer[]

@@ -1,7 +1,7 @@
-export const isValidCpf = (cpf: string): boolean => /^[0-9]{11}$/.test(cpf)
+export const isValidCpf = (cpf: string): boolean => /^\d{11}$/.test(cpf)
 
 export const isValidPhone = (phone: string): boolean =>
-  /^[1-9]{2}9?[0-9]{8}$/.test(phone)
+  /^[1-9]{2}9?\d{8}$/.test(phone)
 
 export const validateCustomerData = (customer: {
   name: string
