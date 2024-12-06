@@ -25,6 +25,7 @@ const CustomersPage = () => {
     id: string
     name: string
     cpf: string
+    email: string
     phone: string
   }) => {
     const sanitizedPhone = sanitizePhoneNumber(customer.phone)
@@ -48,6 +49,7 @@ const CustomersPage = () => {
           customer: {
             name: customer.name,
             cpf: customer.cpf,
+            email: customer.email,
             phone_number: sanitizedPhone,
           },
           expire_at: EXPIRATION_DATE,
