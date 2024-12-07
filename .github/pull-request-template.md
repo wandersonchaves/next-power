@@ -1,6 +1,6 @@
 ### Issue 😱:
 
-Closes https://github.com/wandersonchaves/next-starter/issues
+Closes https://github.com/wandersonchaves/next-carnet/issues
 
 ### What has been done ✅:
 

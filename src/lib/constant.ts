@@ -7,9 +7,9 @@ export const siteConfig = {
   keywords: () => [
     m.meta_keyword_nextjs(),
     m.meta_keyword_react(),
-    m.meta_keyword_nextjs_starter(),
+    m.meta_keyword_nextjs_carnet(),
     m.meta_keyword_nextjs_boilerplate(),
-    m.meta_keyword_starter_template(),
+    m.meta_keyword_carnet_template(),
     m.meta_keyword_tailwindcss(),
     m.meta_keyword_typescript(),
     m.meta_keyword_shadcn_ui(),

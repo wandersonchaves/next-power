@@ -1,6 +1,7 @@
 'use client'
 
 import {useState} from 'react'
+import Link from 'next/link'
 
 import CustomerTable from '@/components/CustomerTable'
 import Pagination from '@/components/Pagination'
@@ -12,7 +13,7 @@ import {
   TRAVEL_SERVICE_NAME,
 } from '@/config/constants'
 import {useCustomers} from '@/hooks/useCustomers'
-import {logError} from '@/utils/logger'
+import {logError, logSuccess} from '@/utils/logger'
 import {sanitizePhoneNumber} from '@/utils/phoneUtils'
 
 const CustomersPage = () => {
@@ -62,7 +63,7 @@ const CustomersPage = () => {
 
       const data = await response.json()
       alert('Carnê gerado com sucesso!')
-      console.log('Resposta do servidor:', data)
+      logSuccess('Resposta do servidor:', data)
     } catch (error) {
       alert('Erro ao gerar o carnê')
       logError('Erro ao gerar o carnê:', error)
@@ -77,7 +78,13 @@ const CustomersPage = () => {
 
   return (
     <div className="p-6">
-      <h1 className="mb-4 text-xl font-bold">Lista de Clientes</h1>
+      <h1 className="mb-4 text-2xl font-bold">Clientes</h1>
+      <Link
+        href="/customers/new"
+        className="text-blue-500 underline"
+      >
+        Cadastrar Novo Cliente
+      </Link>
       <CustomerTable
         customers={customers}
         onGenerateCarnet={handleGenerateCarnet}

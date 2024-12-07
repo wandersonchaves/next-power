@@ -6,7 +6,7 @@ describe('Homepage', () => {
   it('renders the Components', () => {
     render(<Home />)
 
-    const heading = screen.getByText('Next.js starter template', {
+    const heading = screen.getByText('Next.js carnet template', {
       selector: 'h1',
     })
 

@@ -4,7 +4,7 @@ import React, {useState} from 'react'
 import {toast} from 'react-hot-toast'
 
 import FileUpload from '@/components/FileUpload'
-import {logError} from '@/utils/logger'
+import {logError, logSuccess} from '@/utils/logger'
 
 const ImportPage: React.FC = () => {
   const [loading, setLoading] = useState(false)
@@ -21,7 +21,7 @@ const ImportPage: React.FC = () => {
       })
 
       if (response.ok) {
-        console.log('Upload realizado com sucesso!')
+        logSuccess('Upload realizado com sucesso!')
       } else {
         logError('Erro no upload:', await response.json())
       }
