@@ -15,7 +15,7 @@ export const saveCarnetData = async (
     })
 
     if (!existingCustomer) {
-      throw new Error(`Cliente com CPF ${customer.cpf} não encontrado.`)
+      throw new Error(`Inscrito com CPF ${customer.cpf} não encontrado.`)
     }
 
     const carnetRecord = await prisma.carnet.upsert({

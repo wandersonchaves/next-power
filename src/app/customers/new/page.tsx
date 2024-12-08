@@ -57,7 +57,7 @@ const NewCustomer = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="mb-4 text-2xl font-bold">Cadastrar Novo Cliente</h1>
+      <h1 className="mb-4 text-2xl font-bold">CADASTRAR NOVO INSCRITO</h1>
       <form
         onSubmit={handleSubmit}
         className="space-y-4"
@@ -199,7 +199,7 @@ const NewCustomer = () => {
           disabled={loading}
           className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 sm:w-auto dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
-          {loading ? 'Cadastrando Cliente...' : 'Cadastrar Cliente'}
+          {loading ? 'Cadastrando...' : 'Cadastrar'}
         </button>
       </form>
     </div>

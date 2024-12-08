@@ -78,13 +78,15 @@ const CustomersPage = () => {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between">
-        <h1 className="mb-4 text-2xl font-bold">Clientes</h1>
+      <div className="mb-4 flex justify-between">
+        <h1 className="mb-4 text-lg font-bold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-4xl dark:text-white">
+          INSCRITOS
+        </h1>
         <Link
           href="/customers/new"
-          className="mb-2 me-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          className="mb-2 me-2 flex items-center rounded-lg bg-gray-400 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
-          Cadastrar Novo Cliente
+          Nova Inscrição
         </Link>
       </div>
       <CustomerTable

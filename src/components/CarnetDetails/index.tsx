@@ -15,7 +15,7 @@ const CarnetDetails: React.FC<{carnet: Carnet}> = ({carnet}) => {
         <strong>ID:</strong> {carnet.id}
       </p>
       <p>
-        <strong>Cliente:</strong> {carnet.customerName}
+        <strong>Inscrito:</strong> {carnet.customerName}
       </p>
       <p>
         <strong>Valor Total:</strong> {carnet.totalValue}

@@ -18,7 +18,7 @@ const CarnetTable: React.FC<CarnetTableProps> = ({carnets, onViewDetails}) => {
       <thead>
         <tr>
           <th className="border border-gray-300 p-2">ID</th>
-          <th className="border border-gray-300 p-2">Cliente</th>
+          <th className="border border-gray-300 p-2">Inscrito</th>
           <th className="border border-gray-300 p-2">Valor Total</th>
           <th className="border border-gray-300 p-2">Data de Criação</th>
           <th className="border border-gray-300 p-2">Ações</th>
