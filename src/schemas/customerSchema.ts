@@ -15,6 +15,7 @@ export const customerSchema = z.object({
   address: z.string().optional(),
   postalCode: z.string().optional(),
   spouseName: z.string().optional(),
+  status: z.enum(['pending', 'confirmed', 'waiting_list']),
 })
 
 export type CustomerInput = z.infer<typeof customerSchema>

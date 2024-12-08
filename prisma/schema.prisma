@@ -73,6 +73,7 @@ model Customer {
   address         String?
   postalCode      String?
   spouseName      String?
+  status          String    @default("pending")
   carnetGenerated Boolean   @default(false)
 
   userId  String

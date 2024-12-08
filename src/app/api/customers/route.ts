@@ -46,7 +46,6 @@ export async function POST(request: Request) {
     }
 
     const userId = session.user.id
-
     const payload = await request.json()
 
     if (!payload) {
@@ -57,9 +56,28 @@ export async function POST(request: Request) {
 
     const validatedData = customerSchema.parse(payload)
 
+    const existingCustomer = await prisma.customer.findUnique({
+      where: {cpf: validatedData.cpf},
+    })
+
+    if (existingCustomer) {
+      return new Response(
+        JSON.stringify({
+          message: 'Já existe um cliente com este CPF.',
+          customer: existingCustomer,
+        }),
+        {status: 409},
+      )
+    }
+
     const newCustomer = await prisma.customer.create({
       data: {
         ...validatedData,
+        birthDate: validatedData.birthDate
+          ? new Date(validatedData.birthDate)
+          : null,
+        status: validatedData.status ?? 'waiting_list',
+        carnetGenerated: false,
         user: {connect: {id: userId}},
       },
     })
@@ -67,6 +85,15 @@ export async function POST(request: Request) {
     return new Response(JSON.stringify(newCustomer), {status: 201})
   } catch (err) {
     console.error(err)
+
+    if (err instanceof Error && 'code' in err && err.code === 'P2002') {
+      return new Response(
+        JSON.stringify({
+          error: 'Erro ao criar cliente. CPF já cadastrado.',
+        }),
+        {status: 409},
+      )
+    }
 
     return new Response(
       JSON.stringify({error: 'Erro ao processar o pedido.', details: err}),

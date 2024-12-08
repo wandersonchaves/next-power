@@ -5,11 +5,11 @@ export const saveCarnetData = async (
   carnet: Carnet,
   customer: CustomerData,
 ) => {
-  try {
-    if (!carnet || !customer) {
-      throw new Error('Carnet ou Customer não podem ser nulos.')
-    }
+  if (!carnet || !customer) {
+    throw new Error('Carnet ou Customer não podem ser nulos.')
+  }
 
+  try {
     const existingCustomer = await prisma.customer.findUnique({
       where: {cpf: customer.cpf},
     })
@@ -17,6 +17,11 @@ export const saveCarnetData = async (
     if (!existingCustomer) {
       throw new Error(`Inscrito com CPF ${customer.cpf} não encontrado.`)
     }
+
+    await prisma.customer.update({
+      where: {cpf: customer.cpf},
+      data: {carnetGenerated: true},
+    })
 
     const carnetRecord = await prisma.carnet.upsert({
       where: {carnetId: carnet.carnetId},

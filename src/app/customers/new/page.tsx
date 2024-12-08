@@ -15,14 +15,17 @@ const NewCustomer = () => {
     address: '',
     postalCode: '',
     spouseName: '',
+    status: 'pending',
   })
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const {name, value} = e.target
-    setFormData({...formData, [name]: value})
+    setFormData((prev) => ({...prev, [name]: value}))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,7 +78,7 @@ const NewCustomer = () => {
               name="name"
               placeholder="Ex.: João da Silva"
               value={formData.name}
-              onChange={handleChange}
+              onChange={handleInputChange}
               required
               className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
             />
@@ -92,7 +95,7 @@ const NewCustomer = () => {
               name="cpf"
               placeholder="Ex.: 123.456.789-00"
               value={formData.cpf}
-              onChange={handleChange}
+              onChange={handleInputChange}
               required
               className="w-full rounded border p-2"
             />
@@ -108,7 +111,7 @@ const NewCustomer = () => {
               type="date"
               name="birthDate"
               value={formData.birthDate}
-              onChange={handleChange}
+              onChange={handleInputChange}
               className="w-full rounded border p-2"
             />
           </div>
@@ -124,7 +127,7 @@ const NewCustomer = () => {
               name="phone"
               placeholder="Ex.: (86) 99999-9999"
               value={formData.phone}
-              onChange={handleChange}
+              onChange={handleInputChange}
               className="w-full rounded border p-2"
             />
           </div>
@@ -140,7 +143,7 @@ const NewCustomer = () => {
               name="email"
               placeholder="Ex.: joao.silva@email.com"
               value={formData.email}
-              onChange={handleChange}
+              onChange={handleInputChange}
               className="w-full rounded border p-2"
             />
           </div>
@@ -156,7 +159,7 @@ const NewCustomer = () => {
               name="address"
               placeholder="Ex.: Rua das Flores, 123"
               value={formData.address}
-              onChange={handleChange}
+              onChange={handleInputChange}
               className="w-full rounded border p-2"
             />
           </div>
@@ -172,7 +175,7 @@ const NewCustomer = () => {
               name="postalCode"
               placeholder="Ex.: 64000-000"
               value={formData.postalCode}
-              onChange={handleChange}
+              onChange={handleInputChange}
               className="w-full rounded border p-2"
             />
           </div>
@@ -188,9 +191,28 @@ const NewCustomer = () => {
               name="spouseName"
               placeholder="Ex.: Maria da Silva"
               value={formData.spouseName}
-              onChange={handleChange}
+              onChange={handleInputChange}
               className="w-full rounded border p-2"
             />
+          </div>
+          <div>
+            <label
+              htmlFor="status"
+              className="block text-sm font-medium"
+            >
+              Status
+            </label>
+            <select
+              id="status"
+              name="status"
+              value={formData.status}
+              onChange={handleInputChange}
+              className="w-full rounded border px-3 py-2"
+            >
+              <option value="pending">Pendente</option>
+              <option value="confirmed">Confirmado</option>
+              <option value="waiting_list">Lista de Espera</option>
+            </select>
           </div>
           <div>{error && <p className="text-red-500">{error}</p>}</div>
         </div>
