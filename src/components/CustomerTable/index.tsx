@@ -1,3 +1,5 @@
+import {useEffect, useState} from 'react'
+
 import {Customer} from '@/types/Customer'
 import {sanitizePhoneNumber} from '@/utils/phoneUtils'
 
@@ -9,6 +11,22 @@ interface CustomerTableProps {
   customers: Customer[]
   onGenerateCarnet: (customer: Customer) => void
   generatingCustomerId: string | null
+}
+
+const getStatusColor = (status: string): string => {
+  switch (status) {
+    case 'paid':
+    case 'settled':
+      return 'bg-green-100 text-green-800'
+    case 'waiting':
+      return 'bg-yellow-100 text-yellow-800'
+    case 'unpaid':
+    case 'contested':
+    case 'canceled':
+      return 'bg-red-100 text-red-800'
+    default:
+      return 'bg-gray-100 text-gray-800'
+  }
 }
 
 const getCarnetStatusDescription = (status: string): string => {
@@ -24,24 +42,75 @@ const getCarnetStatusDescription = (status: string): string => {
   }
 }
 
-const isChargeResolved = (status: string): boolean => {
-  const resolvedStatuses = [
-    'paid',
-    'contested',
-    'refunded',
-    'settled',
-    'canceled',
-  ]
-  return resolvedStatuses.includes(status)
-}
-
 const CustomerTable: React.FC<CustomerTableProps> = ({
   customers,
   onGenerateCarnet,
   generatingCustomerId,
 }) => {
+  const [chargeStatuses, setChargeStatuses] = useState<Record<string, string>>(
+    {},
+  )
+  console.log('🚀 ~ chargeStatuses:', chargeStatuses)
+  const [loading, setLoading] = useState(false)
+
+  const fetchChargeStatus = async (chargeId: string) => {
+    if (!chargeId) {
+      console.error('chargeId não fornecido.')
+      return 'ID inválido'
+    }
+
+    try {
+      const response = await fetch(`/api/charge/${chargeId}/status`)
+      if (response.ok) {
+        const {data} = await response.json()
+        console.log('🚀 ~ fetchChargeStatus ~ data:', data)
+        return data.status || 'Desconhecido'
+      }
+      if (response.status === 404) {
+        return 'Não encontrado'
+      }
+      return 'Erro'
+    } catch (error) {
+      console.error(`Erro ao buscar status para charge ID ${chargeId}:`, error)
+      return 'Erro'
+    }
+  }
+
+  useEffect(() => {
+    const fetchAllChargesStatus = async () => {
+      setLoading(true)
+
+      const statuses: Record<string, string> = {}
+      for (const customer of customers) {
+        if (customer.carnets) {
+          for (const charge of customer.carnets[0]?.charges || []) {
+            try {
+              const status = await fetchChargeStatus(charge.chargeId)
+              statuses[charge.chargeId] = status
+            } catch (error) {
+              console.error(
+                `Erro ao buscar status para charge ID ${charge.chargeId}`,
+                error,
+              )
+              statuses[charge.chargeId] = 'Erro'
+            }
+          }
+        }
+      }
+      setChargeStatuses(statuses)
+      setLoading(false)
+    }
+
+    fetchAllChargesStatus()
+  }, [customers])
+
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+      {loading && (
+        <p className="text-center text-sm text-gray-500">
+          Carregando status...
+        </p>
+      )}
       <table className="w-full text-left text-sm text-gray-500 rtl:text-right dark:text-gray-400">
         <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
           <tr>
@@ -75,11 +144,9 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
                     {customer.carnets[0].charges?.map((charge) => (
                       <span
                         key={charge.chargeId}
-                        className={`inline-block rounded px-3 py-1 text-xs font-medium ${
-                          isChargeResolved(charge.status)
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
+                        className={`inline-block rounded px-3 py-1 text-xs font-medium ${getStatusColor(
+                          chargeStatuses[charge.chargeId] || 'Desconhecido',
+                        )}`}
                       >
                         {charge.parcel}
                       </span>
