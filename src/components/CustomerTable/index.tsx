@@ -11,6 +11,30 @@ interface CustomerTableProps {
   generatingCustomerId: string | null
 }
 
+const getCarnetStatusDescription = (status: string): string => {
+  switch (status) {
+    case 'up_to_date':
+      return 'Em dia'
+    case 'unpaid':
+      return 'Inadimplente'
+    case 'finished':
+      return 'Finalizado'
+    default:
+      return 'Desconhecido'
+  }
+}
+
+const isChargeResolved = (status: string): boolean => {
+  const resolvedStatuses = [
+    'paid',
+    'contested',
+    'refunded',
+    'settled',
+    'canceled',
+  ]
+  return resolvedStatuses.includes(status)
+}
+
 const CustomerTable: React.FC<CustomerTableProps> = ({
   customers,
   onGenerateCarnet,
@@ -39,54 +63,55 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
             >
               <th className="px-6 py-4">{customer.name}</th>
               <td className="px-6 py-4">{customer.cpf}</td>
-              <td className="px-6 py-4">{customer.email ?? 'Não informado'}</td>
+              <td className="px-6 py-4">{customer.email || 'Não informado'}</td>
               <td className="px-6 py-4">
-                {customer.phone ? (
-                  sanitizePhoneNumber(customer.phone)
-                ) : (
+                {sanitizePhoneNumber(customer.phone || '') ?? (
                   <span className="text-red-500">Telefone inválido</span>
                 )}
-              </td>{' '}
+              </td>
               <td className="px-6 py-4">
                 {customer.carnets && customer.carnets.length > 0 ? (
-                  customer.carnets[0]?.charges &&
-                  customer.carnets[0].charges.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {customer.carnets[0].charges.map((charge, index) => (
-                        <span
-                          key={`charge-${charge.chargeId}-${index}`}
-                          className={`inline-block rounded px-2 py-1 text-sm font-medium ${
-                            charge.status === 'paid'
-                              ? 'bg-green-200 text-green-700'
-                              : 'bg-gray-200 text-gray-700'
-                          }`}
-                        >
-                          {charge.parcel}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <span>Sem parcelas</span>
-                  )
+                  <div className="flex flex-wrap gap-2">
+                    {customer.carnets[0].charges?.map((charge) => (
+                      <span
+                        key={charge.chargeId}
+                        className={`inline-block rounded px-3 py-1 text-xs font-medium ${
+                          isChargeResolved(charge.status)
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {charge.parcel}
+                      </span>
+                    ))}
+                  </div>
                 ) : (
-                  <span>Sem carnês</span>
+                  <span className="text-gray-500">Sem parcelas</span>
                 )}
               </td>
-              <td className="px-6 py-4 text-right">
+              <td className="px-6 py-4">
                 {customer.carnets && customer.carnets.length > 0 ? (
-                  <button
-                    onClick={() =>
-                      onViewCarnet(customer.carnets?.[0]?.link ?? '')
-                    }
-                    className="mb-2 me-2 rounded-lg bg-orange-400 px-5 py-2.5 text-sm font-medium text-white hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-300 dark:bg-orange-600 dark:hover:bg-orange-700 dark:focus:ring-orange-800"
-                  >
-                    Ver Carnê
-                  </button>
+                  <>
+                    <div>
+                      <span className="font-medium">
+                        Status:{' '}
+                        {getCarnetStatusDescription(customer.carnets[0].status)}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() =>
+                        onViewCarnet(customer.carnets?.[0]?.link ?? '')
+                      }
+                      className="mt-1 rounded-lg bg-orange-400 px-5 py-2.5 text-sm font-medium text-white hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-300"
+                    >
+                      Ver Carnê
+                    </button>
+                  </>
                 ) : (
                   <button
                     onClick={() => onGenerateCarnet(customer)}
                     disabled={generatingCustomerId === customer.id}
-                    className="mb-2 me-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    className="mb-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300"
                   >
                     {generatingCustomerId === customer.id
                       ? 'Gerando...'
