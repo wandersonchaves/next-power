@@ -11,8 +11,10 @@ export const SignInButton = () => {
   const [isPending, startTransition] = useTransition()
 
   const handleSignIn = () => {
-    startTransition(async () => {
-      await signIn('google')
+    startTransition(() => {
+      signIn('google').catch((error) => {
+        console.error('Erro ao realizar login:', error)
+      })
     })
   }
 

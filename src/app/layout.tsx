@@ -1,11 +1,10 @@
 import '@/styles/globals.css'
 
-import {PropsWithChildren} from 'react'
+import React, {PropsWithChildren} from 'react'
 import {LanguageProvider} from '@inlang/paraglide-next'
 import type {Metadata} from 'next'
 
-import {Footer} from '@/components/footer'
-import {Navbar} from '@/components/navbar/navbar'
+import Navbar from '@/components/navbar/navbar'
 import {ThemeProvider} from '@/components/theme-provider'
 import {ThemeSwitcher} from '@/components/theme-switcher'
 import {Toaster} from '@/components/ui/toaster'
@@ -60,7 +59,7 @@ const RootLayout = ({children}: PropsWithChildren) => {
             <Navbar />
             {children}
             <ThemeSwitcher className="absolute bottom-5 right-5 z-10" />
-            <Footer />
+            {/* <Footer /> */}
             <Toaster />
           </ThemeProvider>
         </body>

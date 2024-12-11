@@ -1,16 +1,24 @@
-import {getServerSession} from 'next-auth'
+'use client'
 
-import {LanguageSwitcher} from './language-switcher'
+import {useEffect, useState} from 'react'
+import type {Session} from 'next-auth'
+import {getSession} from 'next-auth/react'
 
-import {authOptions} from '@/app/api/auth/[...nextauth]/auth-options'
 import {SignInButton} from '@/components/navbar/sign-in-button'
 import {UserDropdown} from '@/components/navbar/user-dropdown'
 import {Link} from '@/lib/i18n'
 import * as m from '@/paraglide/messages'
 
-export const Navbar = async () => {
-  const session = await getServerSession(authOptions)
+const Navbar = () => {
+  const [session, setSession] = useState<Session | null>(null)
 
+  useEffect(() => {
+    const fetchSession = async () => {
+      const sessionData = await getSession()
+      setSession(sessionData)
+    }
+    fetchSession()
+  }, [])
   return (
     <header className="w-full border-b">
       <div className="container flex h-16 items-center justify-between">
@@ -22,9 +30,10 @@ export const Navbar = async () => {
         </Link>
         <div className="flex items-center gap-2">
           {session ? <UserDropdown session={session} /> : <SignInButton />}
-          <LanguageSwitcher />
         </div>
       </div>
     </header>
   )
 }
+
+export default Navbar

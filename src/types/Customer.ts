@@ -1,3 +1,18 @@
+export interface Charge {
+  chargeId: string
+  parcel: number
+  status: string
+  value: number
+  expireAt: Date
+}
+
+export interface Carnet {
+  id: string
+  status: string
+  link: string
+  charges?: Charge[]
+}
+
 export interface Customer {
   id: string
   name: string
@@ -8,9 +23,5 @@ export interface Customer {
   carnetGenerated: boolean
   carnetStatus?: string
   carnetLink?: string
-  carnets?: Array<{
-    id: string
-    status: string
-    link: string
-  }>
+  carnets?: Carnet[]
 }

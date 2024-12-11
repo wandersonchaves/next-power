@@ -18,15 +18,12 @@ export const getCustomers = async ({
         skip,
         take: limit,
         orderBy: {createdAt: 'desc'},
-        select: {
-          id: true,
-          name: true,
-          cpf: true,
-          email: true,
-          phone: true,
-          createdAt: true,
-          carnetGenerated: true,
-          carnets: true,
+        include: {
+          carnets: {
+            include: {
+              charges: true,
+            },
+          },
         },
       }),
       prisma.customer.count(),
