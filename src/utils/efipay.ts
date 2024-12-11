@@ -3,57 +3,64 @@ import axios from 'axios'
 const API_BASE_URL =
   process.env.EFI_API_BASE_URL ?? 'https://cobrancas-h.api.efipay.com.br/v1'
 
-let cachedAccessToken: string | null = null
-let cachedTokenExpiry: number | null = null
+const AUTH_URL =
+  process.env.NODE_ENV === 'production'
+    ? 'https://cobrancas.api.efipay.com.br/v1/authorize'
+    : 'https://cobrancas-h.api.efipay.com.br/v1/authorize'
 
-export async function getAuthorizationToken(): Promise<string> {
+const CLIENT_ID = process.env.EFI_CLIENT_ID || ''
+const CLIENT_SECRET = process.env.EFI_CLIENT_SECRET || ''
+
+if (!CLIENT_ID || !CLIENT_SECRET) {
+  throw new Error('As credenciais da Efipay não estão configuradas.')
+}
+
+let cachedToken: string | null = null
+let tokenExpiry: number | null = null
+
+export const getAuthorizationToken = async (): Promise<string> => {
+  if (cachedToken && tokenExpiry && Date.now() < tokenExpiry) {
+    return cachedToken // Retorna o token em cache se ainda for válido.
+  }
+
   try {
-    if (
-      cachedAccessToken &&
-      cachedTokenExpiry &&
-      Date.now() < cachedTokenExpiry
-    ) {
-      return cachedAccessToken
-    }
-
-    const clientId = process.env.EFI_CLIENT_ID
-    const clientSecret = process.env.EFI_CLIENT_SECRET
-
-    if (!clientId || !clientSecret) {
-      console.error('Client ID ou Client Secret não estão configurados.')
-      throw new Error('Configuração de autenticação está incompleta.')
-    }
-
-    const authData = {
-      grant_type: 'client_credentials',
-    }
-
-    const authHeader = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`
-
-    const response = await axios.post(`${API_BASE_URL}/authorize`, authData, {
-      headers: {
-        Authorization: authHeader,
-        'Content-Type': 'application/json',
+    const credentials = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
+      'base64',
+    )
+    const response = await axios.post(
+      AUTH_URL,
+      {grant_type: 'client_credentials'},
+      {
+        headers: {
+          Authorization: `Basic ${credentials}`,
+          'Content-Type': 'application/json',
+        },
       },
-    })
+    )
 
     const {access_token, expires_in} = response.data
-
-    if (!access_token) {
-      console.error('Resposta inesperada ao buscar token:', response.data)
-      throw new Error('Token de autorização não encontrado.')
-    }
-
-    cachedAccessToken = access_token
-    cachedTokenExpiry = Date.now() + expires_in * 1000
+    cachedToken = access_token
+    tokenExpiry = Date.now() + expires_in * 1000
 
     return access_token
-  } catch (error: unknown) {
-    console.error('Erro ao buscar token de autorização:', error)
-    if (axios.isAxiosError(error) && error.response) {
-      console.error('Detalhes do erro da API:', error.response.data)
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      // Caso o erro seja do Axios
+      console.error('Erro ao fazer a requisição:', {
+        message: error.message,
+        code: error.code,
+        response: error.response?.data,
+      })
+      throw new Error('Erro de requisição HTTP')
+    } else if (error instanceof Error) {
+      // Caso seja outro tipo de erro
+      console.error('Erro genérico:', error.message)
+      throw error
+    } else {
+      // Para erros desconhecidos
+      console.error('Erro desconhecido:', error)
+      throw new Error('Ocorreu um erro inesperado')
     }
-    throw new Error('Não foi possível autenticar na API da Efipay.')
   }
 }
 
