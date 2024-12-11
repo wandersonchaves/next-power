@@ -1,19 +1,7 @@
 import React, {useEffect, useState} from 'react'
 
+import type {Customer} from '@/types/Customer'
 import {sanitizePhoneNumber} from '@/utils/phoneUtils'
-
-interface Customer {
-  id: string
-  name: string
-  cpf: string
-  email: string
-  phone: string
-  carnets?: {
-    status: string
-    link: string
-    charges: {chargeId: string; parcel: number}[]
-  }[]
-}
 
 interface CustomerTableProps {
   customers: Customer[]
