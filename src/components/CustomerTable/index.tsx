@@ -13,17 +13,18 @@ interface CustomerTableProps {
   generatingCustomerId: string | null
 }
 
-const getStatusColor = (status: string): string => {
+const getColorForStatus = (status: string): string => {
   switch (status) {
     case 'paid':
     case 'settled':
       return 'bg-green-100 text-green-800'
     case 'waiting':
-      return 'bg-yellow-100 text-yellow-800'
     case 'unpaid':
-    case 'contested':
-    case 'canceled':
       return 'bg-red-100 text-red-800'
+    case 'contested':
+    case 'refunded':
+    case 'canceled':
+      return 'bg-yellow-100 text-yellow-800'
     default:
       return 'bg-gray-100 text-gray-800'
   }
@@ -50,10 +51,9 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
   const [chargeStatuses, setChargeStatuses] = useState<Record<string, string>>(
     {},
   )
-  console.log('🚀 ~ chargeStatuses:', chargeStatuses)
   const [loading, setLoading] = useState(false)
 
-  const fetchChargeStatus = async (chargeId: string) => {
+  const fetchChargeStatus = async (chargeId: string): Promise<string> => {
     if (!chargeId) {
       console.error('chargeId não fornecido.')
       return 'ID inválido'
@@ -62,20 +62,23 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
     try {
       const response = await fetch(`/api/charge/${chargeId}/status`)
       if (response.ok) {
-        const {data} = await response.json()
-        console.log('🚀 ~ fetchChargeStatus ~ data:', data)
-        return data.status || 'Desconhecido'
+        const {status} = await response.json()
+
+        return status?.data?.status || 'Desconhecido'
       }
+
       if (response.status === 404) {
+        console.error(`Charge ID ${chargeId} não encontrado.`)
         return 'Não encontrado'
       }
+
+      console.error(`Erro inesperado na requisição para charge ID ${chargeId}.`)
       return 'Erro'
     } catch (error) {
       console.error(`Erro ao buscar status para charge ID ${chargeId}:`, error)
       return 'Erro'
     }
   }
-
   useEffect(() => {
     const fetchAllChargesStatus = async () => {
       setLoading(true)
@@ -139,22 +142,16 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
                 )}
               </td>
               <td className="px-6 py-4">
-                {customer.carnets && customer.carnets.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {customer.carnets[0].charges?.map((charge) => (
-                      <span
-                        key={charge.chargeId}
-                        className={`inline-block rounded px-3 py-1 text-xs font-medium ${getStatusColor(
-                          chargeStatuses[charge.chargeId] || 'Desconhecido',
-                        )}`}
-                      >
-                        {charge.parcel}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <span className="text-gray-500">Sem parcelas</span>
-                )}
+                {customer.carnets?.[0]?.charges?.map((charge) => (
+                  <span
+                    key={charge.chargeId}
+                    className={`inline-block rounded px-3 py-1 text-xs font-medium ${getColorForStatus(
+                      chargeStatuses[charge.chargeId] || 'Desconhecido',
+                    )}`}
+                  >
+                    {charge.parcel}
+                  </span>
+                )) || <span className="text-gray-500">Sem parcelas</span>}
               </td>
               <td className="px-6 py-4">
                 {customer.carnets && customer.carnets.length > 0 ? (

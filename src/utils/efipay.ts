@@ -44,7 +44,6 @@ export async function getAuthorizationToken(): Promise<string> {
       throw new Error('Token de autorização não encontrado.')
     }
 
-    // Cache do token e seu tempo de expiração
     cachedAccessToken = access_token
     cachedTokenExpiry = Date.now() + expires_in * 1000
 
