@@ -81,12 +81,15 @@ export const cancelCarnet = async (
 }
 
 export const getChargeStatus = async (chargeId: string, token: string) => {
-  const response = await axios.get(`${API_BASE_URL}/charge/${chargeId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
+  const response = await axios.get(
+    `https://cobrancas.api.efipay.com.br/v1/charge/${chargeId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     },
-  })
+  )
 
   return response.data
 }

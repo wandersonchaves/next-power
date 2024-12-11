@@ -1,10 +1,18 @@
-import {useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 
-import {Customer} from '@/types/Customer'
 import {sanitizePhoneNumber} from '@/utils/phoneUtils'
 
-const onViewCarnet = (carnetLink: string) => {
-  window.open(carnetLink, '_blank')
+interface Customer {
+  id: string
+  name: string
+  cpf: string
+  email: string
+  phone: string
+  carnets?: {
+    status: string
+    link: string
+    charges: {chargeId: string; parcel: number}[]
+  }[]
 }
 
 interface CustomerTableProps {
@@ -14,33 +22,25 @@ interface CustomerTableProps {
 }
 
 const getColorForStatus = (status: string): string => {
-  switch (status) {
-    case 'paid':
-    case 'settled':
-      return 'bg-green-100 text-green-800'
-    case 'waiting':
-    case 'unpaid':
-      return 'bg-red-100 text-red-800'
-    case 'contested':
-    case 'refunded':
-    case 'canceled':
-      return 'bg-yellow-100 text-yellow-800'
-    default:
-      return 'bg-gray-100 text-gray-800'
+  const statusMap: Record<string, string> = {
+    paid: 'bg-green-100 text-green-800',
+    settled: 'bg-green-100 text-green-800',
+    waiting: 'bg-red-100 text-red-800',
+    unpaid: 'bg-red-100 text-red-800',
+    contested: 'bg-yellow-100 text-yellow-800',
+    refunded: 'bg-yellow-100 text-yellow-800',
+    canceled: 'bg-yellow-100 text-yellow-800',
   }
+  return statusMap[status] || 'bg-gray-100 text-gray-800'
 }
 
 const getCarnetStatusDescription = (status: string): string => {
-  switch (status) {
-    case 'up_to_date':
-      return 'Em dia'
-    case 'unpaid':
-      return 'Inadimplente'
-    case 'finished':
-      return 'Finalizado'
-    default:
-      return 'Desconhecido'
+  const descriptionMap: Record<string, string> = {
+    up_to_date: 'Em dia',
+    unpaid: 'Inadimplente',
+    finished: 'Finalizado',
   }
+  return descriptionMap[status] || 'Desconhecido'
 }
 
 const CustomerTable: React.FC<CustomerTableProps> = ({
@@ -54,52 +54,30 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
   const [loading, setLoading] = useState(false)
 
   const fetchChargeStatus = async (chargeId: string): Promise<string> => {
-    if (!chargeId) {
-      console.error('chargeId não fornecido.')
-      return 'ID inválido'
-    }
-
     try {
       const response = await fetch(`/api/charge/${chargeId}/status`)
       if (response.ok) {
         const {status} = await response.json()
-
         return status?.data?.status || 'Desconhecido'
       }
-
-      if (response.status === 404) {
-        console.error(`Charge ID ${chargeId} não encontrado.`)
-        return 'Não encontrado'
-      }
-
-      console.error(`Erro inesperado na requisição para charge ID ${chargeId}.`)
-      return 'Erro'
+      return response.status === 404 ? 'Não encontrado' : 'Erro'
     } catch (error) {
       console.error(`Erro ao buscar status para charge ID ${chargeId}:`, error)
       return 'Erro'
     }
   }
+
   useEffect(() => {
     const fetchAllChargesStatus = async () => {
       setLoading(true)
-
       const statuses: Record<string, string> = {}
+
       for (const customer of customers) {
-        if (customer.carnets) {
-          for (const charge of customer.carnets[0]?.charges || []) {
-            try {
-              const status = await fetchChargeStatus(charge.chargeId)
-              statuses[charge.chargeId] = status
-            } catch (error) {
-              console.error(
-                `Erro ao buscar status para charge ID ${charge.chargeId}`,
-                error,
-              )
-              statuses[charge.chargeId] = 'Erro'
-            }
-          }
+        for (const charge of customer.carnets?.[0]?.charges || []) {
+          statuses[charge.chargeId] = await fetchChargeStatus(charge.chargeId)
         }
       }
+
       setChargeStatuses(statuses)
       setLoading(false)
     }
@@ -114,7 +92,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
           Carregando status...
         </p>
       )}
-      <table className="w-full text-left text-sm text-gray-500 rtl:text-right dark:text-gray-400">
+      <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
         <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             <th className="px-6 py-3">Nome</th>
@@ -122,9 +100,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
             <th className="px-6 py-3">Email</th>
             <th className="px-6 py-3">Telefone</th>
             <th className="px-6 py-3">Parcelas</th>
-            <th className="px-6 py-3">
-              <span className="sr-only">Carnê</span>
-            </th>
+            <th className="px-6 py-3">Carnê</th>
           </tr>
         </thead>
         <tbody>
@@ -154,7 +130,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
                 )) || <span className="text-gray-500">Sem parcelas</span>}
               </td>
               <td className="px-6 py-4">
-                {customer.carnets && customer.carnets.length > 0 ? (
+                {customer.carnets?.length ? (
                   <>
                     <div>
                       <span className="font-medium">
@@ -164,9 +140,9 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
                     </div>
                     <button
                       onClick={() =>
-                        onViewCarnet(customer.carnets?.[0]?.link ?? '')
+                        window.open(customer.carnets?.[0]?.link, '_blank')
                       }
-                      className="mt-1 rounded-lg bg-orange-400 px-5 py-2.5 text-sm font-medium text-white hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-300"
+                      className="mt-1 rounded-lg bg-orange-400 px-5 py-2.5 text-sm font-medium text-white hover:bg-orange-500"
                     >
                       Ver Carnê
                     </button>
