@@ -12,16 +12,9 @@ declare module 'sdk-typescript-apis-efi' {
     repeats: number
     value: number
     link: string
+    cover: string
     carnetLink?: string
-    pdf: {
-      carnet: string
-      cover: string
-    }
     created_at: string
-    history: Array<{
-      message: string
-      created_at: string
-    }>
     charges: Array<{
       charge_id: number
       parcel: number
@@ -30,18 +23,6 @@ declare module 'sdk-typescript-apis-efi' {
       expire_at: string
       url: string
       parcel_link: string
-      pdf: {
-        charge: string
-      }
-      barcode: string
-      pix: {
-        qrcode: string
-        qrcode_image: string
-      }
-      configurations: {
-        interest: number
-        fine: number
-      }
     }>
   }
 
@@ -68,10 +49,6 @@ declare module 'sdk-typescript-apis-efi' {
     expire_at: string
     repeats: number
     split_items?: boolean
-    configurations?: {
-      fine?: number
-      interest?: number
-    }
     message?: string
   }
 

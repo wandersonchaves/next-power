@@ -1,8 +1,9 @@
 import {prisma} from '@/lib/prisma'
-import {Carnet, type CustomerData} from '@/types/Carnet'
+import type {CarnetOutput} from '@/types/Carnet'
+import type {CustomerData} from '@/types/Customer'
 
 export const saveCarnetData = async (
-  carnet: Carnet,
+  carnet: CarnetOutput,
   customer: CustomerData,
 ) => {
   if (!carnet || !customer) {
@@ -33,10 +34,7 @@ export const saveCarnetData = async (
         cover: carnet.cover,
         link: carnet.link,
         carnetLink: carnet.carnetLink ?? '',
-        pdf: JSON.stringify(carnet.pdf),
-        createdAt: carnet.createdAt || new Date(),
         customerId: existingCustomer.id,
-        history: JSON.stringify(carnet.history || []),
         charges: {
           create: Array.isArray(carnet.charges)
             ? carnet.charges.map((charge) => ({
@@ -46,11 +44,6 @@ export const saveCarnetData = async (
                 value: charge.value,
                 expireAt: charge.expireAt,
                 url: charge.url,
-                pdf: charge.pdf,
-                barcode: charge.barcode,
-                pixQrCode: charge.pixQrCode || '',
-                pixQrImage: charge.pixQrImage || '',
-                configurations: JSON.stringify(charge.configurations || {}),
               }))
             : [],
         },
@@ -61,8 +54,6 @@ export const saveCarnetData = async (
         cover: carnet.cover,
         link: carnet.link,
         carnetLink: carnet.carnetLink ?? '',
-        pdf: JSON.stringify(carnet.pdf),
-        history: JSON.stringify(carnet.history || []),
       },
     })
 

@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react'
 
-import type {Customer} from '@/types/Customer'
+import type {CustomerOutput} from '@/types/Customer'
 import {sanitizePhoneNumber} from '@/utils/phoneUtils'
 
 interface CustomerTableProps {
-  customers: Customer[]
-  onGenerateCarnet: (customer: Customer) => void
+  customers: CustomerOutput[]
+  onGenerateCarnet: (customer: CustomerOutput) => void
   generatingCustomerId: string | null
 }
 
@@ -13,7 +13,7 @@ const getColorForStatus = (status: string): string => {
   const statusMap: Record<string, string> = {
     paid: 'bg-green-100 text-green-800',
     settled: 'bg-green-100 text-green-800',
-    waiting: 'bg-red-100 text-red-800',
+    waiting: 'bg-yellow-100 text-yellow-800',
     unpaid: 'bg-red-100 text-red-800',
     contested: 'bg-yellow-100 text-yellow-800',
     refunded: 'bg-yellow-100 text-yellow-800',

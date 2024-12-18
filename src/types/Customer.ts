@@ -1,27 +1,38 @@
-export interface Charge {
-  chargeId: string
-  parcel: number
-  status: string
-  value: number
-  expireAt: Date
+import type {CarnetOutput} from './Carnet'
+
+export interface CustomerInput {
+  name: string
+  cpf: string
+  birthDate?: Date
+  phone?: string
+  email?: string
+  address?: string
+  postalCode?: string
+  spouseName?: string
+  status?: string
+  carnetGenerated?: boolean
+  userId: string
 }
 
-export interface Carnet {
-  id: string
-  status: string
-  link: string
-  charges?: Charge[]
-}
-
-export interface Customer {
+export interface CustomerOutput {
   id: string
   name: string
   cpf: string
-  email: string
-  phone: string
-  carnetId?: string
+  birthDate?: Date
+  phone?: string
+  email?: string
+  address?: string
+  postalCode?: string
+  spouseName?: string
+  status: string
   carnetGenerated: boolean
-  carnetStatus?: string
-  carnetLink?: string
-  carnets?: Carnet[]
+
+  userId: string
+  carnets: CarnetOutput[]
+}
+
+export interface CustomerData {
+  name: string
+  cpf: string
+  phone_number: string
 }

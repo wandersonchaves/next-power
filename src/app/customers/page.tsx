@@ -26,10 +26,10 @@ const CustomersPage = () => {
     id: string
     name: string
     cpf: string
-    email: string
-    phone: string
+    email?: string
+    phone?: string
   }) => {
-    const sanitizedPhone = sanitizePhoneNumber(customer.phone)
+    const sanitizedPhone = sanitizePhoneNumber(customer.phone ?? '')
 
     if (!sanitizedPhone) {
       alert(`Número de telefone inválido para o cliente: ${customer.name}`)

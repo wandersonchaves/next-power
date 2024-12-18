@@ -2,11 +2,11 @@
 
 import {useEffect, useState} from 'react'
 
-import type {Customer} from '@/types/Customer'
+import type {CustomerOutput} from '@/types/Customer'
 import {logError} from '@/utils/logger'
 
 interface UseCustomersResult {
-  customers: Customer[]
+  customers: CustomerOutput[]
   loading: boolean
   totalPages: number
   currentPage: number
@@ -17,7 +17,7 @@ export const useCustomers = (
   initialPage: number = 1,
   limit: number = 10,
 ): UseCustomersResult => {
-  const [customers, setCustomers] = useState<Customer[]>([])
+  const [customers, setCustomers] = useState<CustomerOutput[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [totalPages, setTotalPages] = useState<number>(1)
   const [currentPage, setCurrentPage] = useState<number>(initialPage)

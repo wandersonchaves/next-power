@@ -77,7 +77,7 @@ model Customer {
   carnetGenerated Boolean   @default(false)
 
   userId  String
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id])
   carnets Carnet[]
 
   createdAt DateTime @default(now())
@@ -97,12 +97,9 @@ model Carnet {
   cover      String
   link       String
   carnetLink String?
-  pdf        String
 
   createdAt DateTime @default(now())
   charges   Charge[]
-
-  history Json
 }
 
 model Charge {
@@ -111,18 +108,12 @@ model Charge {
   carnet   Carnet @relation(fields: [carnetId], references: [id])
   carnetId String
 
-  chargeId   String @unique
-  status     String
-  url        String
-  barcode    String
-  pdf        String
-  pixQrCode  String
-  pixQrImage String
-  parcel     Int
-  value      Int
+  chargeId String @unique
+  status   String
+  url      String
+  parcel   Int
+  value    Int
 
   expireAt  DateTime
   createdAt DateTime @default(now())
-
-  configurations Json
 }
