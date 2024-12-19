@@ -17,7 +17,7 @@ export const getCustomers = async ({
       prisma.customer.findMany({
         skip,
         take: limit,
-        orderBy: {createdAt: 'desc'},
+        orderBy: {name: 'asc'},
         include: {
           carnets: {
             include: {
